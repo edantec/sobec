@@ -41,13 +41,15 @@ void initialize(HorizonManager &self, const bp::dict &settings,
 
 bp::dict get_contacts(HorizonManager &self, const unsigned long time) {
   bp::dict contacts;
-  for (std::string frame : self.contacts(time)->get_active_set())
-    contacts[frame] = self.contacts(time)->get_active_set().find(frame) !=
-                      self.contacts(time)->get_active_set().end();
+  for (std::string frame : self.contacts(time)->get_active())
+    contacts[frame] = std::find(self.contacts(time)->get_active().begin(),
+                                self.contacts(time)->get_active().end(),
+                                frame) != self.contacts(time)->get_active().end();
 
-  for (std::string frame : self.contacts(time)->get_inactive_set())
-    contacts[frame] = self.contacts(time)->get_active_set().find(frame) !=
-                      self.contacts(time)->get_active_set().end();
+  for (std::string frame : self.contacts(time)->get_inactive())
+    contacts[frame] = std::find(self.contacts(time)->get_active().begin(),
+                                self.contacts(time)->get_active().end(),
+                                frame) != self.contacts(time)->get_active().end();
   return contacts;
 }
 

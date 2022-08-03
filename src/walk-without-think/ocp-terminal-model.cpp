@@ -28,8 +28,9 @@ AMA OCPWalk::buildTerminalModel() {
        ++k) {  // k, cid in enumerate(robot.contactIds):
     if (contact_pattern(k, T) == 0.0) continue;
     int cid = robot->contactIds[k];
+    crocoddyl::FramePlacement contact_placement(cid, pinocchio::SE3::Identity());
     auto contact = boost::make_shared<ContactModel6D>(
-        state, cid, pinocchio::SE3::Identity(), actuation->get_nu(),
+        state, contact_placement, actuation->get_nu(),
         params->baumgartGains);
     contacts->addContact(robot->model->frames[cid].name + "_contact", contact);
   }

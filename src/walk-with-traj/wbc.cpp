@@ -232,10 +232,10 @@ void WBC::updateSupportTiming() {
   land_LF_cycle_ -= 1;
   takeoff_LF_cycle_ -= 1;
   takeoff_RF_cycle_ -= 1;
-  if (land_RF_cycle_ < 0) land_RF_cycle_ = 2 * settings_.Tstep ; 
-  if (land_LF_cycle_ < 0) land_LF_cycle_ = 2 * settings_.Tstep ; 
-  if (takeoff_LF_cycle_ < 0) takeoff_LF_cycle_ = 2 * settings_.Tstep; 
-  if (takeoff_RF_cycle_ < 0) takeoff_RF_cycle_ = 2 * settings_.Tstep; 
+  if (land_RF_cycle_ < 0) land_RF_cycle_ = 2 * settings_.Tstep - 1; 
+  if (land_LF_cycle_ < 0) land_LF_cycle_ = 2 * settings_.Tstep - 1; 
+  if (takeoff_LF_cycle_ < 0) takeoff_LF_cycle_ = 2 * settings_.Tstep - 1; 
+  if (takeoff_RF_cycle_ < 0) takeoff_RF_cycle_ = 2 * settings_.Tstep - 1; 
 
   if (land_LF_.size() > 0 && land_LF_[0] < 0) land_LF_.erase(land_LF_.begin());
 
@@ -269,7 +269,7 @@ const supportSwitch &WBC::getSwitches(const unsigned long before,
     return switch_;
   }
   if (horizon_.supportSize(before) == 2) {
-    if (contacts_after_.find(designer_.get_LF_name()) ==
+    if (std::find(contacts_after_.begin(),contacts_after_.end(),designer_.get_LF_name()) ==
         contacts_after_.end()) {
       switch_ = TAKEOFF_LF;  // case LF not in contact_after
       return switch_;
@@ -277,8 +277,8 @@ const supportSwitch &WBC::getSwitches(const unsigned long before,
     switch_ = TAKEOFF_RF;  // case RF not in contact_after
     return switch_;
   }
-  if (contacts_before_.find(designer_.get_LF_name()) ==
-      contacts_before_.end()) {
+  if (std::find(contacts_before_.begin(),contacts_before_.end(),designer_.get_LF_name()) ==
+        contacts_before_.end()) {
     switch_ = LAND_LF;  // case LF not in contact_before
     return switch_;
   }
