@@ -17,10 +17,6 @@ void exposeActivationQuadRef();
 void exposeDesigner();
 void exposeHorizonManager();
 void exposeModelFactory();
-void exposeIntegratedActionLPF();
-void exposeStateLPF();
-void exposeDAMContactFwdDyn();
-void exposeResidualContactForce();
 void exposeWBC();
 void exposeFootTrajectory();
 void exposeFlex();
@@ -28,20 +24,6 @@ void exposeOCPWalk();
 void exposeMPCWalk();
 
 }  // namespace python
-}  // namespace sobec
-
-namespace sobec {
-namespace newcontacts {
-namespace python {
-
-void exposeResidualContactForce();
-void exposeDAMContactFwdDyn();
-void exposeContact3D();
-void exposeContact1D();
-void exposeMultipleContacts();
-
-}  // namespace python
-}  // namespace newcontacts
 }  // namespace sobec
 
 #endif  // #ifndef __sobec_python__
