@@ -61,24 +61,10 @@ set(${PROJECT_NAME}_HEADERS
   include/${PROJECT_NAME}/crocomplements/residual-vel-collision.hpp
   include/${PROJECT_NAME}/crocomplements/residual-fly-high.hpp
   include/${PROJECT_NAME}/crocomplements/activation-quad-ref.hpp
-  include/${PROJECT_NAME}/crocomplements/lowpassfilter/state.hpp
-  include/${PROJECT_NAME}/crocomplements/lowpassfilter/state.hxx
-  include/${PROJECT_NAME}/crocomplements/lowpassfilter/action.hpp
-  include/${PROJECT_NAME}/crocomplements/lowpassfilter/action.hxx
-  include/${PROJECT_NAME}/crocomplements/contact/contact3d.hpp
-  include/${PROJECT_NAME}/crocomplements/contact/contact1d.hpp
-  include/${PROJECT_NAME}/crocomplements/contact/multiple-contacts.hpp
-  include/${PROJECT_NAME}/crocomplements/contact/contact-fwddyn.hpp
-  include/${PROJECT_NAME}/crocomplements/contact/contact-force.hpp
   include/${PROJECT_NAME}/crocomplements/residual-com-velocity.hxx
   include/${PROJECT_NAME}/crocomplements/residual-cop.hxx
   include/${PROJECT_NAME}/crocomplements/residual-feet-collision.hxx
   include/${PROJECT_NAME}/crocomplements/residual-vel-collision.hxx
-  include/${PROJECT_NAME}/crocomplements/contact/contact3d.hxx
-  include/${PROJECT_NAME}/crocomplements/contact/contact1d.hxx
-  include/${PROJECT_NAME}/crocomplements/contact/multiple-contacts.hxx
-  include/${PROJECT_NAME}/crocomplements/contact/contact-fwddyn.hxx
-  include/${PROJECT_NAME}/crocomplements/contact/contact-force.hxx
   include/${PROJECT_NAME}/crocomplements/residual-fly-high.hxx
   include/${PROJECT_NAME}/walk-without-think/ocp.hpp
   include/${PROJECT_NAME}/walk-without-think/mpc.hpp

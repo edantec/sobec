@@ -9,12 +9,6 @@ set(${PY_NAME}_SOURCES
   crocomplements/residual-feet-collision.cpp
   crocomplements/residual-fly-high.cpp
   crocomplements/activation-quad-ref.cpp
-  crocomplements/lowpassfilter/action.cpp
-  crocomplements/contact/contact3d.cpp
-  crocomplements/contact/contact1d.cpp
-  crocomplements/contact/multiple-contacts.cpp
-  crocomplements/contact/contact-fwddyn.cpp
-  crocomplements/contact/contact-force.cpp
   walk-with-traj/designer.cpp
   walk-with-traj/horizon_manager.cpp
   walk-with-traj/model_factory.cpp
