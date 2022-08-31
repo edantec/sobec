@@ -306,7 +306,6 @@ int HorizonManager::supportSize(const unsigned long time) {
   support_size_ = 2;
   if (std::find(active_contacts_.begin(),active_contacts_.end(),settings_.leftFootName) == active_contacts_.end()) support_size_ -= 1;
   if (std::find(active_contacts_.begin(),active_contacts_.end(),settings_.rightFootName) == active_contacts_.end()) support_size_ -= 1;
-    support_size_ -= 1;
   return support_size_;
 }
 
