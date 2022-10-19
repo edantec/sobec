@@ -95,7 +95,7 @@ set(${PROJECT_NAME}_HEADERS
 	include/${PROJECT_NAME}/walk-with-traj/designer.hpp
 	include/${PROJECT_NAME}/walk-with-traj/model_factory.hpp
 	include/${PROJECT_NAME}/walk-with-traj/horizon_manager.hpp
-	# include/${PROJECT_NAME}/walk-with-traj/ocp.hpp
+	#include/${PROJECT_NAME}/walk-with-traj/ocp.hpp
 	include/${PROJECT_NAME}/walk-with-traj/wbc.hpp
 	include/${PROJECT_NAME}/walk-with-traj/foot_trajectory.hpp
  )

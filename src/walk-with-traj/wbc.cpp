@@ -234,8 +234,6 @@ void WBC::updateNonThinkingReferences() {
   double yaw_right_ = atan2(designer_.get_RF_frame().rotation().data()[1], designer_.get_RF_frame().rotation().data()[0]);
   for (unsigned long time = 0; time < horizon_.size(); time++) {
 	  horizon_.setVelocityRefCOM(time,"comVelocity",ref_com_vel_);
-	  horizon_.setVelocityRefFeet(time,"velFoot_RF",ref_feet_vel_);
-	  horizon_.setVelocityRefFeet(time,"velFoot_LF",ref_feet_vel_);
 	  horizon_.setTranslationReference(time, "Z_translation_LF", getPoseRef_LF(time).translation());
 	  horizon_.setTranslationReference(time, "Z_translation_RF", getPoseRef_RF(time).translation());
 	  horizon_.setSurfaceInequality(time,"surface_LF",designer_.get_RF_frame().translation().head(2),yaw_right_);

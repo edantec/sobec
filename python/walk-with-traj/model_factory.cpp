@@ -47,6 +47,7 @@ void initialize(ModelMaker &self, const bp::dict &settings,
 
   // gains
   conf.wFootPlacement = bp::extract<double>(settings["wFootPlacement"]);
+  conf.wHandPlacement = bp::extract<double>(settings["wHandPlacement"]);
   conf.wStateReg = bp::extract<double>(settings["wStateReg"]);
   conf.wControlReg = bp::extract<double>(settings["wControlReg"]);
   conf.wLimit = bp::extract<double>(settings["wLimit"]);
@@ -78,6 +79,7 @@ bp::dict get_settings(ModelMaker &self) {
   settings["omega"] = conf.omega;
   settings["footSize"] = conf.footSize;
   settings["wFootPlacement"] = conf.wFootPlacement;
+  settings["wHandPlacement"] = conf.wHandPlacement;
   settings["wStateReg"] = conf.wStateReg;
   settings["wControlReg"] = conf.wControlReg;
   settings["wLimit"] = conf.wLimit;
@@ -114,6 +116,15 @@ bp::list formulateHorizon(ModelMaker &self,
   }
 }
 
+bp::list formulateHandHorizon(ModelMaker &self,
+                          const bp::list &supports = bp::list()) {
+  std::vector<Support> contacts;
+  py_list_to_std_vector(supports, contacts);
+  std::vector<AMA> models = self.formulateHandHorizon(contacts);
+
+  return std_vector_to_py_list(models);
+}
+
 void defineFeetContact(ModelMaker &self,
                        crocoddyl::ContactModelMultiple &contactCollector,
                        const Support &supports = Support::DOUBLE) {
@@ -147,11 +158,17 @@ void defineFeetTracking(ModelMaker &self,
   costCollector = *costs;
 }
 
-void defineDCMTask(ModelMaker &self,
-                        crocoddyl::CostModelSum &costCollector,
-                        const Support &supports = Support::DOUBLE) {
+void defineHandTracking(ModelMaker &self,
+                        crocoddyl::CostModelSum &costCollector) {
   Cost costs = boost::make_shared<crocoddyl::CostModelSum>(costCollector);
-  self.defineDCMTask(costs, supports);
+  self.defineHandTracking(costs);
+  costCollector = *costs;
+}
+
+void defineDCMTask(ModelMaker &self,
+                        crocoddyl::CostModelSum &costCollector) {
+  Cost costs = boost::make_shared<crocoddyl::CostModelSum>(costCollector);
+  self.defineDCMTask(costs);
   costCollector = *costs;
 }
 
@@ -187,13 +204,12 @@ void defineCoPTask(ModelMaker &self,
 void exposeModelFactory() {
   bp::enum_<Support>("Support")
       .value("LEFT", Support::LEFT)
-      .value("RIGHT", Support::RIGHT)
-      .value("DOUBLE", Support::DOUBLE);
+      .value("LEFT", Support::RIGHT)
+      .value("DOUBLE", Support::DOUBLE)
+      .value("HAND", Support::HAND);
 
   bp::class_<ModelMaker>("ModelMaker", bp::init<>())
       .def("initialize", &initialize, bp::args("self", "settings", "design"))
-      // .def("formulateHorizon", &formulateHorizon, bp::args("self",
-      // "supports"))
       .def("get_settings", &get_settings, bp::args("self"))
       .def("defineFeetContact", &defineFeetContact,
            (bp::arg("self"), bp::arg("contactCollector"),
@@ -207,9 +223,10 @@ void exposeModelFactory() {
       .def("defineFeetTracking", &defineFeetTracking,
            (bp::arg("self"), bp::arg("costCollector"),
             bp::arg("supports") = Support::DOUBLE))
+      .def("defineHandTracking", &defineHandTracking,
+           bp::arg("self"), bp::arg("costCollector"))
       .def("defineDCMTask", &defineDCMTask,
-           (bp::arg("self"), bp::arg("costCollector"),
-            bp::arg("supports") = Support::DOUBLE))
+           bp::arg("self"), bp::arg("costCollector"))
       .def("definePostureTask", &definePostureTask,
            bp::args("self", "costCollector"))
       .def("defineActuationTask", &defineActuationTask,
@@ -221,7 +238,11 @@ void exposeModelFactory() {
             bp::arg("supports") = Support::DOUBLE))
       .def("formulateStepTracker", &ModelMaker::formulateStepTracker,
            (bp::arg("self"), bp::arg("supports") = Support::DOUBLE))
+      .def("formulateHandTracker", &ModelMaker::formulateHandTracker,
+           (bp::arg("self"), bp::arg("supports") = Support::DOUBLE))
       .def("formulateTerminalStepTracker", &ModelMaker::formulateTerminalStepTracker,
+           (bp::arg("self"), bp::arg("supports") = Support::DOUBLE))
+      .def("formulateTerminalHandTracker", &ModelMaker::formulateTerminalHandTracker,
            (bp::arg("self"), bp::arg("supports") = Support::DOUBLE))
       .def("getState", &ModelMaker::getState, bp::args("self"))
       .def("setState", &ModelMaker::setState, bp::args("self"))
@@ -229,7 +250,9 @@ void exposeModelFactory() {
       .def("setActuation", &ModelMaker::setActuation, bp::args("self"))
       .def("formulateHorizon", &formulateHorizon,
            (bp::arg("self"), bp::arg("supports") = bp::list(),
-            bp::arg("length") = 0));
+            bp::arg("length") = 0))
+      .def("formulateHandHorizon", &formulateHandHorizon,
+           (bp::arg("self"), bp::arg("supports") = bp::list()));
 }
 }  // namespace python
 }  // namespace sobec

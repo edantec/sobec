@@ -35,6 +35,8 @@ void initialize(sobec::RobotDesigner &self, bp::dict settings) {
   conf.srdfPath = bp::extract<std::string>(settings["srdfPath"]);
   conf.leftFootName = bp::extract<std::string>(settings["leftFootName"]);
   conf.rightFootName = bp::extract<std::string>(settings["rightFootName"]);
+  conf.leftHandName = bp::extract<std::string>(settings["leftHandName"]);
+  conf.rightHandName = bp::extract<std::string>(settings["rightHandName"]);
   conf.robotDescription =
       bp::extract<std::string>(settings["robotDescription"]);
   py_list_to_std_vector(settings["controlledJointsNames"],
@@ -50,6 +52,8 @@ bp::dict get_settings(RobotDesigner &self) {
   settings["srdfPath"] = conf.srdfPath;
   settings["leftFootName"] = conf.leftFootName;
   settings["rightFootName"] = conf.rightFootName;
+  settings["leftHandName"] = conf.leftHandName;
+  settings["rightHandName"] = conf.rightHandName;
   settings["robotDescription"] = conf.robotDescription;
 
   return settings;
@@ -82,6 +86,14 @@ void exposeDesigner() {
       .def("get_RF_frame",
            bp::make_function(
                &RobotDesigner::get_RF_frame,
+               bp::return_value_policy<bp::reference_existing_object>()))
+      .def("get_LH_frame",
+           bp::make_function(
+               &RobotDesigner::get_LH_frame,
+               bp::return_value_policy<bp::reference_existing_object>()))
+      .def("get_RH_frame",
+           bp::make_function(
+               &RobotDesigner::get_RH_frame,
                bp::return_value_policy<bp::reference_existing_object>()))
       .def("getRobotMass", &RobotDesigner::getRobotMass)
       .def("get_rModel",
@@ -128,6 +140,14 @@ void exposeDesigner() {
            bp::make_function(
                &RobotDesigner::get_RF_name,
                bp::return_value_policy<bp::copy_const_reference>()))
+      .def("get_LH_name",
+           bp::make_function(
+               &RobotDesigner::get_LH_name,
+               bp::return_value_policy<bp::copy_const_reference>()))
+      .def("get_RH_name",
+           bp::make_function(
+               &RobotDesigner::get_RH_name,
+               bp::return_value_policy<bp::copy_const_reference>()))
       .def("get_LF_id",
            bp::make_function(
                &RobotDesigner::get_LF_id,
@@ -135,6 +155,14 @@ void exposeDesigner() {
       .def("get_RF_id",
            bp::make_function(
                &RobotDesigner::get_RF_id,
+               bp::return_value_policy<bp::copy_const_reference>()))
+      .def("get_LH_id",
+           bp::make_function(
+               &RobotDesigner::get_LH_id,
+               bp::return_value_policy<bp::copy_const_reference>()))
+      .def("get_RH_id",
+           bp::make_function(
+               &RobotDesigner::get_RH_id,
                bp::return_value_policy<bp::copy_const_reference>()))
       .def("get_LF_heel_id",
            bp::make_function(

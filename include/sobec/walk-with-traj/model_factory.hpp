@@ -13,7 +13,7 @@
 
 namespace sobec {
 
-enum Support { LEFT, RIGHT, DOUBLE };
+enum Support { LEFT, RIGHT, DOUBLE, HAND };
 
 struct ModelMakerSettings {
  public:
@@ -36,6 +36,7 @@ struct ModelMakerSettings {
 
   // Croco configuration
   double wFootPlacement = 0;  // 1000;
+  double wHandPlacement = 0;  // 1000;
   double wStateReg = 0;       // 100;
   double wControlReg = 0;     // 0.001;
   double wLimit = 0;          // 1e3;
@@ -71,10 +72,13 @@ class ModelMaker {
   bool initialized_ = false;
 
   AMA formulateStepTracker(const Support &support = Support::DOUBLE);
+  AMA formulateHandTracker(const Support &support = Support::DOUBLE);
   AMA formulateTerminalStepTracker(const Support &support = Support::DOUBLE); 
+  AMA formulateTerminalHandTracker(const Support &support = Support::DOUBLE); 
   AMA formulate_stair_climber(const Support &support = Support::DOUBLE);
 
   std::vector<AMA> formulateHorizon(const std::vector<Support> &supports);
+  std::vector<AMA> formulateHandHorizon(const std::vector<Support> &supports);
   std::vector<AMA> formulateHorizon(const int &T);
   ModelMakerSettings &get_settings() { return settings_; }
 
@@ -83,10 +87,13 @@ class ModelMaker {
                             const Support &support = Support::DOUBLE);
   void defineFeetContact(Contact &contactCollector,
                          const Support &support = Support::DOUBLE);
+  void defineHandContact(Contact &contactCollector,
+                         const Support &support = Support::HAND);
   void defineFeetWrenchCost(Cost &costCollector,
                             const Support &support = Support::DOUBLE);
   void defineFeetTracking(Cost &costCollector,
                           const Support &support = Support::DOUBLE);
+  void defineHandTracking(Cost &costCollector);
 
   void definePostureTask(Cost &costCollector);
   void defineActuationTask(Cost &costCollector);
