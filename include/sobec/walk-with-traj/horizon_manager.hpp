@@ -98,14 +98,10 @@ class HorizonManager {
   void setVelocityRefFeet(const unsigned long time,
                           const std::string &nameCost,
                           const pinocchio::Motion &ref_velocity);
-  void activateContactLF(const unsigned long time,
-                         const std::string &nameContacttLF);
-  void activateContactRF(const unsigned long time,
-                         const std::string &nameContactRF);
-  void removeContactLF(const unsigned long time,
-                       const std::string &nameContactLF);
-  void removeContactRF(const unsigned long time,
-                       const std::string &nameContactRF);
+  void activateContact(const unsigned long time,
+                       const std::string &nameContactt);
+  void removeContact(const unsigned long time,
+                     const std::string &nameContact);
   void setForceReference(const unsigned long time,
                            const std::string &nameCost,
                            const eVector6 &reference);

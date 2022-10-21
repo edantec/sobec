@@ -96,7 +96,12 @@ class BulletTalos:
         p.setAdditionalSearchPath(path)
         self.stepId = p.loadURDF("step/step.urdf")
         p.resetBasePositionAndOrientation(self.stepId, posObj=position,ornObj=[0,0,0,1])
-
+    
+    def addTable(self, path, position):
+        p.setAdditionalSearchPath(path)
+        self.tableId = p.loadURDF("table/table.urdf")
+        p.resetBasePositionAndOrientation(self.tableId, posObj=position,ornObj=[0,0,0,1])
+    
     def execute(self, torques):
         p.setJointMotorControlArray(
             self.robotId,
@@ -172,7 +177,28 @@ class BulletTalos:
             specularColor=[0.4, 0.4, 0],
             visualFramePosition=[0.0, 0.0, 0.0],
         )
+    
+    def showHandToTrack(self, RH_pose):
+        visualShapeTarget = p.createVisualShape(
+            shapeType=p.GEOM_BOX,
+            halfExtents=[0.05, 0.05, 0.05],
+            rgbaColor=[0.0, 0.0, 1.0, 1.0],
+            specularColor=[0.4, 0.4, 0],
+            visualFramePosition=[0.0, 0.0, 0.0],
+        )
 
+        self.sphereIdHand = p.createMultiBody(
+            baseMass=0.0,
+            baseInertialFramePosition=[0, 0, 0],
+            baseVisualShapeIndex=visualShapeTarget,
+            basePosition=[
+                RH_pose[0],
+                RH_pose[1],
+                RH_pose[2],
+            ],
+            useMaximalCoordinates=True,
+        )
+    
     def moveMarkers(self, LF_pose, RF_pose):
 
         p.resetBasePositionAndOrientation(
@@ -183,6 +209,13 @@ class BulletTalos:
         p.resetBasePositionAndOrientation(
             self.sphereIdLeft,
             posObj=[LF_pose.translation[0], LF_pose.translation[1], 0],
+            ornObj=np.array([0.0, 0.0, 0.0, 1.0]),
+        )
+    def moveHandTarget(self, RH_pose):
+
+        p.resetBasePositionAndOrientation(
+            self.sphereIdHand,
+            posObj=[RH_pose.translation[0], RH_pose.translation[1], RH_pose.translation[2]],
             ornObj=np.array([0.0, 0.0, 0.0, 1.0]),
         )
 

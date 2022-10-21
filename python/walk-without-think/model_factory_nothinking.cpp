@@ -254,10 +254,6 @@ void define2DSurfaceTask(ModelMakerNoThinking &self,
 }
 
 void exposeModelFactoryNoThinking() {
-  bp::enum_<Support>("Support")
-      .value("LEFT", Support::LEFT)
-      .value("RIGHT", Support::RIGHT)
-      .value("DOUBLE", Support::DOUBLE);
 
   bp::class_<ModelMakerNoThinking>("ModelMakerNoThinking", bp::init<>())
       .def("initialize", &initialize, bp::args("self", "settings", "design"))

@@ -5,7 +5,7 @@
 #include <boost/python/return_internal_reference.hpp>
 #include <crocoddyl/core/activation-base.hpp>
 #include <eigenpy/eigenpy.hpp>
-#include <sobec/walk-with-traj/model_factory.hpp>
+#include <sobec/hand_table/model_factory_hand.hpp>
 
 #include "sobec/fwd.hpp"
 
@@ -28,36 +28,28 @@ bp::list std_vector_to_py_list(const std::vector<T> &v) {
   return l;
 }
 
-void initialize(ModelMaker &self, const bp::dict &settings,
+void initialize(ModelMakerHand &self, const bp::dict &settings,
                 const RobotDesigner &designer) {
-  ModelMakerSettings conf;
+  ModelMakerHandSettings conf;
 
   // timing
   conf.timeStep = bp::extract<double>(settings["timeStep"]);
 
   // physics
   conf.gravity = bp::extract<eVector3>(settings["gravity"]);
-  conf.mu = bp::extract<double>(settings["mu"]);
-  conf.coneBox = bp::extract<eVector2>(settings["coneBox"]);
-  conf.minNforce = bp::extract<double>(settings["minNforce"]);
-  conf.maxNforce = bp::extract<double>(settings["maxNforce"]);
   conf.comHeight = bp::extract<double>(settings["comHeight"]);
   conf.omega = bp::extract<double>(settings["omega"]);
-  conf.footSize = bp::extract<double>(settings["footSize"]);
 
   // gains
-  conf.wFootPlacement = bp::extract<double>(settings["wFootPlacement"]);
+  conf.wHandPlacement = bp::extract<double>(settings["wHandPlacement"]);
   conf.wStateReg = bp::extract<double>(settings["wStateReg"]);
   conf.wControlReg = bp::extract<double>(settings["wControlReg"]);
   conf.wLimit = bp::extract<double>(settings["wLimit"]);
-  conf.wWrenchCone = bp::extract<double>(settings["wWrenchCone"]);
-  conf.wForceTask = bp::extract<double>(settings["wForceTask"]);
-  conf.wCoP = bp::extract<double>(settings["wCoP"]);
+  conf.wForceHand = bp::extract<double>(settings["wForceHand"]);
   conf.wDCM = bp::extract<double>(settings["wDCM"]);
   conf.wCoM = bp::extract<double>(settings["wCoM"]);
   conf.stateWeights = bp::extract<Eigen::VectorXd>(settings["stateWeights"]);
   conf.controlWeights = bp::extract<Eigen::VectorXd>(settings["controlWeights"]);
-  conf.forceWeights = bp::extract<Eigen::VectorXd>(settings["forceWeights"]);
   conf.lowKinematicLimits = bp::extract<Eigen::VectorXd>(settings["lowKinematicLimits"]);
   conf.highKinematicLimits = bp::extract<Eigen::VectorXd>(settings["highKinematicLimits"]);
   conf.th_grad = bp::extract<double>(settings["th_grad"]);
@@ -66,30 +58,22 @@ void initialize(ModelMaker &self, const bp::dict &settings,
   self.initialize(conf, designer);
 }
 
-bp::dict get_settings(ModelMaker &self) {
-  ModelMakerSettings conf = self.get_settings();
+bp::dict get_settings(ModelMakerHand &self) {
+  ModelMakerHandSettings conf = self.get_settings();
   bp::dict settings;
   settings["timeStep"] = conf.timeStep;
   settings["gravity"] = conf.gravity;
-  settings["mu"] = conf.mu;
-  settings["coneBox"] = conf.coneBox;
-  settings["minNforce"] = conf.minNforce;
-  settings["maxNforce"] = conf.maxNforce;
   settings["comHeight"] = conf.comHeight;
   settings["omega"] = conf.omega;
-  settings["footSize"] = conf.footSize;
-  settings["wFootPlacement"] = conf.wFootPlacement;
+  settings["wHandPlacement"] = conf.wHandPlacement;
   settings["wStateReg"] = conf.wStateReg;
   settings["wControlReg"] = conf.wControlReg;
   settings["wLimit"] = conf.wLimit;
-  settings["wWrenchCone"] = conf.wWrenchCone;
-  settings["wForceTask"] = conf.wForceTask;
-  settings["wCoP"] = conf.wCoP;
+  settings["wForceHand"] = conf.wForceHand;
   settings["wDCM"] = conf.wDCM;
   settings["wCoM"] = conf.wCoM;
   settings["stateWeights"] = conf.stateWeights;
   settings["controlWeights"] = conf.controlWeights;
-  settings["forceWeights"] = conf.forceWeights;
   settings["lowKinematicLimits"] = conf.lowKinematicLimits;
   settings["highKinematicLimits"] = conf.highKinematicLimits;
   settings["th_grad"] = conf.th_grad;
@@ -97,12 +81,12 @@ bp::dict get_settings(ModelMaker &self) {
   return settings;
 }
 
-bp::list formulateHorizon(ModelMaker &self,
-                          const bp::list &supports = bp::list(),
+bp::list formulateHorizon(ModelMakerHand &self,
+                          const bp::list &phases = bp::list(),
                           const int &length = 0) {
-  if (bp::len(supports) > 0) {
-    std::vector<Support> contacts;
-    py_list_to_std_vector(supports, contacts);
+  if (bp::len(phases) > 0) {
+    std::vector<Phase> contacts;
+    py_list_to_std_vector(phases, contacts);
     std::vector<AMA> models = self.formulateHorizon(contacts);
 
     return std_vector_to_py_list(models);
@@ -112,100 +96,93 @@ bp::list formulateHorizon(ModelMaker &self,
     return std_vector_to_py_list(models);
   } else {
     throw std::runtime_error(
-        "Either a list of supports or an horizon length must be provided.");
+        "Either a list of phases or an horizon length must be provided.");
   }
 }
 
-void defineFeetContact(ModelMaker &self,
-                       crocoddyl::ContactModelMultiple &contactCollector,
-                       const Support &supports = Support::DOUBLE) {
+void defineFeetContact(ModelMakerHand &self,
+                       crocoddyl::ContactModelMultiple &contactCollector) {
   Contact contacts =
       boost::make_shared<crocoddyl::ContactModelMultiple>(contactCollector);
-  self.defineFeetContact(contacts, supports);
+  self.defineFeetContact(contacts);
   contactCollector = *contacts;
 }
 
-void defineFeetWrenchCost(ModelMaker &self,
+void defineHandContact(ModelMakerHand &self,
+                       crocoddyl::ContactModelMultiple &contactCollector,
+                       const Phase &phases = Phase::CONTACT_RIGHT) {
+  Contact contacts =
+      boost::make_shared<crocoddyl::ContactModelMultiple>(contactCollector);
+  self.defineHandContact(contacts, phases);
+  contactCollector = *contacts;
+}
+
+void defineHandForceTask(ModelMakerHand &self,
                           crocoddyl::CostModelSum &costCollector,
-                          const Support &supports = Support::DOUBLE) {
+                          const Phase &phases = Phase::NO_HAND) {
   Cost costs = boost::make_shared<crocoddyl::CostModelSum>(costCollector);
-  self.defineFeetWrenchCost(costs, supports);
+  self.defineHandForceTask(costs, phases);
   costCollector = *costs;
 }
 
-void defineFeetForceTask(ModelMaker &self,
-                          crocoddyl::CostModelSum &costCollector,
-                          const Support &supports = Support::DOUBLE) {
-  Cost costs = boost::make_shared<crocoddyl::CostModelSum>(costCollector);
-  self.defineFeetForceTask(costs, supports);
-  costCollector = *costs;
-}
-
-void defineFeetTracking(ModelMaker &self,
+void defineHandTracking(ModelMakerHand &self,
                         crocoddyl::CostModelSum &costCollector,
-                        const Support &supports = Support::DOUBLE) {
+                        const Phase &phases = Phase::CONTACT_RIGHT) {
   Cost costs = boost::make_shared<crocoddyl::CostModelSum>(costCollector);
-  self.defineFeetTracking(costs, supports);
+  self.defineHandTracking(costs, phases);
   costCollector = *costs;
 }
 
-void defineDCMTask(ModelMaker &self,
+void defineDCMTask(ModelMakerHand &self,
                         crocoddyl::CostModelSum &costCollector) {
   Cost costs = boost::make_shared<crocoddyl::CostModelSum>(costCollector);
   self.defineDCMTask(costs);
   costCollector = *costs;
 }
 
-void definePostureTask(ModelMaker &self,
+void definePostureTask(ModelMakerHand &self,
                        crocoddyl::CostModelSum &costCollector) {
   Cost costs = boost::make_shared<crocoddyl::CostModelSum>(costCollector);
   self.definePostureTask(costs);
   costCollector = *costs;
 }
 
-void defineActuationTask(ModelMaker &self,
+void defineActuationTask(ModelMakerHand &self,
                          crocoddyl::CostModelSum &costCollector) {
   Cost costs = boost::make_shared<crocoddyl::CostModelSum>(costCollector);
   self.defineActuationTask(costs);
   costCollector = *costs;
 }
 
-void defineJointLimits(ModelMaker &self,
+void defineJointLimits(ModelMakerHand &self,
                        crocoddyl::CostModelSum &costCollector) {
   Cost costs = boost::make_shared<crocoddyl::CostModelSum>(costCollector);
   self.defineJointLimits(costs);
   costCollector = *costs;
 }
 
-void defineCoPTask(ModelMaker &self,
-                   crocoddyl::CostModelSum &costCollector,
-                   const Support &supports = Support::DOUBLE) {
-  Cost costs = boost::make_shared<crocoddyl::CostModelSum>(costCollector);
-  self.defineCoPTask(costs, supports);
-  costCollector = *costs;
-}
+void exposeModelFactoryHand() {
+  bp::enum_<Phase>("Phase")
+      .value("TRACKING_LEFT", Phase::TRACKING_LEFT)
+      .value("TRACKING_RIGHT", Phase::TRACKING_RIGHT)
+      .value("NO_HAND", Phase::NO_HAND)
+      .value("CONTACT_LEFT", Phase::CONTACT_LEFT)
+      .value("CONTACT_RIGHT", Phase::CONTACT_RIGHT);
 
-void exposeModelFactory() {
-  bp::enum_<Support>("Support")
-      .value("LEFT", Support::LEFT)
-      .value("RIGHT", Support::RIGHT)
-      .value("DOUBLE", Support::DOUBLE);
-
-  bp::class_<ModelMaker>("ModelMaker", bp::init<>())
+  bp::class_<ModelMakerHand>("ModelMakerHand", bp::init<>())
       .def("initialize", &initialize, bp::args("self", "settings", "design"))
       .def("get_settings", &get_settings, bp::args("self"))
       .def("defineFeetContact", &defineFeetContact,
+           bp::arg("self"), bp::arg("costCollector"))
+      .def("defineHandContact", &defineHandContact,
            (bp::arg("self"), bp::arg("contactCollector"),
-            bp::arg("supports") = Support::DOUBLE))
-      .def("defineFeetWrenchCost", &defineFeetWrenchCost,
+            bp::arg("phases") = Phase::CONTACT_RIGHT))
+      .def("defineHandForceTask", &defineHandForceTask,
            (bp::arg("self"), bp::arg("costCollector"),
-            bp::arg("supports") = Support::DOUBLE))
-      .def("defineFeetForceTask", &defineFeetForceTask,
+            bp::arg("phases") = Phase::NO_HAND))
+      .def("defineHandTracking", &defineHandTracking,
            (bp::arg("self"), bp::arg("costCollector"),
-            bp::arg("supports") = Support::DOUBLE))
-      .def("defineFeetTracking", &defineFeetTracking,
-           (bp::arg("self"), bp::arg("costCollector"),
-            bp::arg("supports") = Support::DOUBLE))
+            bp::arg("phases") = Phase::CONTACT_RIGHT))
       .def("defineDCMTask", &defineDCMTask,
            bp::arg("self"), bp::arg("costCollector"))
       .def("definePostureTask", &definePostureTask,
@@ -214,19 +191,16 @@ void exposeModelFactory() {
            bp::args("self", "costCollector"))
       .def("defineJointLimits", &defineJointLimits,
            bp::args("self", "costCollector"))
-      .def("defineCoPTask", &defineCoPTask,
-           (bp::arg("self"), bp::arg("costCollector"),
-            bp::arg("supports") = Support::DOUBLE))
-      .def("formulateStepTracker", &ModelMaker::formulateStepTracker,
-           (bp::arg("self"), bp::arg("supports") = Support::DOUBLE))
-      .def("formulateTerminalStepTracker", &ModelMaker::formulateTerminalStepTracker,
-           (bp::arg("self"), bp::arg("supports") = Support::DOUBLE))
-      .def("getState", &ModelMaker::getState, bp::args("self"))
-      .def("setState", &ModelMaker::setState, bp::args("self"))
-      .def("getActuation", &ModelMaker::getActuation, bp::args("self"))
-      .def("setActuation", &ModelMaker::setActuation, bp::args("self"))
+      .def("formulateHandTracker", &ModelMakerHand::formulateHandTracker,
+           (bp::arg("self"), bp::arg("phases") = Phase::NO_HAND))
+      .def("formulateTerminalHandTracker", &ModelMakerHand::formulateTerminalHandTracker,
+           (bp::arg("self"), bp::arg("phases") = Phase::NO_HAND))
+      .def("getState", &ModelMakerHand::getState, bp::args("self"))
+      .def("setState", &ModelMakerHand::setState, bp::args("self"))
+      .def("getActuation", &ModelMakerHand::getActuation, bp::args("self"))
+      .def("setActuation", &ModelMakerHand::setActuation, bp::args("self"))
       .def("formulateHorizon", &formulateHorizon,
-           (bp::arg("self"), bp::arg("supports") = bp::list(),
+           (bp::arg("self"), bp::arg("phases") = bp::list(),
             bp::arg("length") = 0));
 }
 }  // namespace python

@@ -21,11 +21,13 @@ BOOST_PYTHON_MODULE(sobec_pywrap) {
   sobec::python::exposeDesigner();
   sobec::python::exposeHorizonManager();
   sobec::python::exposeModelFactory();
+  sobec::python::exposeModelFactoryHand();
   sobec::python::exposeModelFactoryNoThinking();
   sobec::python::exposeFlex();
   sobec::python::exposeIntegratedActionLPF();
   sobec::python::exposeStateLPF();
   sobec::python::exposeWBC();
+  sobec::python::exposeWBCHand();
   sobec::python::exposeOCPWalk();
   sobec::python::exposeMPCWalk();
   sobec::python::exposeFootTrajectory();

@@ -46,25 +46,20 @@ void ModelMaker::defineFeetContact(Contact &contactCollector,
   contactCollector->addContact(designer_.get_RF_name(), ContactModelRight,
                                false);
 
-  if (support == Support::LEFT || support == Support::DOUBLE || support == Support::HAND)
+  if (support != Support::RIGHT)
     contactCollector->changeContactStatus(designer_.get_LF_name(), true);
 
-  if (support == Support::RIGHT || support == Support::DOUBLE || support == Support::HAND)
+  if (support != Support::LEFT)
     contactCollector->changeContactStatus(designer_.get_RF_name(), true);
 }
 
-void ModelMaker::defineHandContact(Contact &contactCollector,
-                                   const Support &support) {
-  boost::shared_ptr<crocoddyl::ContactModelAbstract> ContactModelHand =
-      boost::make_shared<crocoddyl::ContactModel3D>(
-          state_, designer_.get_RH_id(), designer_.get_RH_frame().translation(),
-          actuation_->get_nu(), eVector2(0., 50.));
-
-  contactCollector->addContact(designer_.get_RH_name(), ContactModelHand,
-                               false);
-
-  if (support == Support::HAND)
-    contactCollector->changeContactStatus(designer_.get_RH_name(), true);
+void ModelMaker::defineCoMTask(Cost &costCollector) {
+  boost::shared_ptr<crocoddyl::CostModelAbstract> comCost =
+      boost::make_shared<crocoddyl::CostModelResidual>(
+          state_, boost::make_shared<crocoddyl::ResidualModelCoMPosition>(
+              state_, designer_.get_com_position(), actuation_->get_nu()));
+  costCollector.get()->addCost("comTask", comCost,
+                               settings_.wCoM, true);
 }
 
 void ModelMaker::defineFeetWrenchCost(Cost &costCollector,
@@ -87,9 +82,9 @@ void ModelMaker::defineFeetWrenchCost(Cost &costCollector,
 
   eVector6 refWrench_LF = eVector6::Zero();
   eVector6 refWrench_RF = eVector6::Zero();
-  if (support == Support::LEFT || support == Support::DOUBLE || support == Support::HAND)
+  if (support != Support::RIGHT)
     refWrench_LF(2) = Fz_ref;
-  if (support == Support::RIGHT || support == Support::DOUBLE || support == Support::HAND)
+  if (support != Support::LEFT)
     refWrench_RF(2) = Fz_ref;
 
   Eigen::VectorXd refCost_LF = wrenchCone_LF.get_A() * refWrench_LF;
@@ -122,9 +117,9 @@ void ModelMaker::defineFeetWrenchCost(Cost &costCollector,
                                settings_.wWrenchCone, false);
   costCollector.get()->addCost("wrench_RF", wrenchModel_RF,
                                settings_.wWrenchCone, false);
-  if (support == Support::LEFT || support == Support::DOUBLE || support == Support::HAND)
+  if (support != Support::RIGHT)
     costCollector.get()->changeCostStatus("wrench_LF",true);
-  if (support == Support::RIGHT || support == Support::DOUBLE || support == Support::HAND)
+  if (support != Support::LEFT)
     costCollector.get()->changeCostStatus("wrench_RF",true);
 }
 
@@ -203,9 +198,9 @@ void ModelMaker::defineFeetForceTask(Cost &costCollector, const Support &support
                                settings_.wForceTask, false);
   costCollector.get()->addCost("force_RF", forceModel_RF,
                                settings_.wForceTask, false);
-  if (support == Support::RIGHT || support == Support::DOUBLE || support == Support::HAND)
+  if (support != Support::LEFT)
     costCollector.get()->changeCostStatus("force_RF",true);
-  if (support == Support::LEFT || support == Support::DOUBLE || support == Support::HAND)
+  if (support != Support::RIGHT)
     costCollector.get()->changeCostStatus("force_LF",true);
 }
 
@@ -279,7 +274,7 @@ void ModelMaker::defineDCMTask(Cost &costCollector, const Support &support) {
   if (support == Support::RIGHT) {
 	  ref_position = designer_.get_RF_frame().translation();
   }
-  if (support == Support::DOUBLE || support == Support::HAND) {
+  if (support == Support::DOUBLE) {
 	  ref_position = (designer_.get_RF_frame().translation() + 
 	                  designer_.get_LF_frame().translation()) / 2.;
   }
@@ -295,24 +290,6 @@ void ModelMaker::defineDCMTask(Cost &costCollector, const Support &support) {
   
   costCollector.get()->addCost("DCM", DCM_model,
                                settings_.wDCM, true);
-}
-
-void ModelMaker::defineHandTracking(Cost &costCollector) {
-  boost::shared_ptr<crocoddyl::ActivationModelQuadFlatLog> activationQF =
-      boost::make_shared<crocoddyl::ActivationModelQuadFlatLog>(6, 0.1);
-
-  boost::shared_ptr<crocoddyl::ResidualModelFramePlacement>
-      residual_effector_tracking =
-          boost::make_shared<crocoddyl::ResidualModelFramePlacement>(
-              state_, designer_.get_RH_id(), designer_.get_RH_frame(),
-              actuation_->get_nu());
-
-  boost::shared_ptr<crocoddyl::CostModelAbstract> trackingModel =
-      boost::make_shared<crocoddyl::CostModelResidual>(state_, activationQF,
-                                                       residual_effector_tracking);
-  
-  costCollector.get()->addCost("placement_RH", trackingModel,
-                               settings_.wHandPlacement, true);
 }
 
 void ModelMaker::defineCoPTask(Cost &costCollector, const Support &support) {
@@ -340,10 +317,10 @@ void ModelMaker::defineCoPTask(Cost &costCollector, const Support &support) {
                          settings_.wCoP, false);
   costCollector.get()->addCost(designer_.get_RF_name() + "_cop", copCostRF,
                          settings_.wCoP, false);
-  if (support == Support::LEFT || support == Support::DOUBLE || support == Support::HAND)
+  if (support != Support::RIGHT)
     costCollector.get()->changeCostStatus(designer_.get_LF_name() + "_cop", true);
 
-  if (support == Support::RIGHT || support == Support::DOUBLE || support == Support::HAND)
+  if (support != Support::LEFT)
     costCollector.get()->changeCostStatus(designer_.get_RF_name() + "_cop", true);
 }
 
@@ -370,51 +347,6 @@ AMA ModelMaker::formulateStepTracker(const Support &support) {
       runningDAM, settings_.timeStep);
 
   return runningModel;
-}
-
-AMA ModelMaker::formulateHandTracker(const Support &support) {
-  Contact contacts = boost::make_shared<crocoddyl::ContactModelMultiple>(
-      state_, actuation_->get_nu());
-  Cost costs =
-      boost::make_shared<crocoddyl::CostModelSum>(state_, actuation_->get_nu());
-
-  defineFeetContact(contacts, support);
-  defineHandContact(contacts, support);
-
-  defineJointLimits(costs);
-  definePostureTask(costs);
-  defineActuationTask(costs);
-  defineFeetWrenchCost(costs, support);
-  defineCoPTask(costs, support);
-  defineHandTracking(costs);
-
-  DAM runningDAM =
-      boost::make_shared<crocoddyl::DifferentialActionModelContactFwdDynamics>(
-          state_, actuation_, contacts, costs, 0., true);
-  AMA runningModel = boost::make_shared<crocoddyl::IntegratedActionModelEuler>(
-      runningDAM, settings_.timeStep);
-
-  return runningModel;
-}
-
-AMA ModelMaker::formulateTerminalHandTracker(const Support &support) {
-  Contact contacts = boost::make_shared<crocoddyl::ContactModelMultiple>(
-      state_, actuation_->get_nu());
-  Cost costs =
-      boost::make_shared<crocoddyl::CostModelSum>(state_, actuation_->get_nu());
-
-  defineFeetContact(contacts, support);
-
-  defineJointLimits(costs);
-  definePostureTask(costs);
-
-  DAM terminalDAM =
-      boost::make_shared<crocoddyl::DifferentialActionModelContactFwdDynamics>(
-          state_, actuation_, contacts, costs, 0., true);
-  AMA terminalModel = boost::make_shared<crocoddyl::IntegratedActionModelEuler>(
-      terminalDAM, 0);
-
-  return terminalModel;
 }
 
 AMA ModelMaker::formulateTerminalStepTracker(const Support &support) {
@@ -444,17 +376,6 @@ std::vector<AMA> ModelMaker::formulateHorizon(
   std::vector<AMA> models;
   for (std::size_t i = 0; i < supports.size(); i++) {
 	models.push_back(formulateStepTracker(supports[i]));
-  }
-
-  return models;
-}
-
-std::vector<AMA> ModelMaker::formulateHandHorizon(
-    const std::vector<Support> &supports) {
-  // for loop to generate a vector of IAMs
-  std::vector<AMA> models;
-  for (std::size_t i = 0; i < supports.size(); i++) {
-	models.push_back(formulateHandTracker(supports[i]));
   }
 
   return models;

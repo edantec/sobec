@@ -98,6 +98,8 @@ set(${PROJECT_NAME}_HEADERS
 	#include/${PROJECT_NAME}/walk-with-traj/ocp.hpp
 	include/${PROJECT_NAME}/walk-with-traj/wbc.hpp
 	include/${PROJECT_NAME}/walk-with-traj/foot_trajectory.hpp
+	include/${PROJECT_NAME}/hand_table/model_factory_hand.hpp
+	include/${PROJECT_NAME}/hand_table/wbc_hand.hpp
  )
 
 set(${PROJECT_NAME}_SOURCES
@@ -107,6 +109,8 @@ set(${PROJECT_NAME}_SOURCES
 	# src/walk-with-traj/ocp.cpp
 	src/walk-with-traj/wbc.cpp
 	src/walk-with-traj/foot_trajectory.cpp
+	src/hand_table/model_factory_hand.cpp
+	src/hand_table/wbc_hand.cpp
 	src/flexibility_compensation.cpp
 	src/walk-without-think/model_factory_nothinking.cpp
 	src/walk-without-think/ocp.cpp

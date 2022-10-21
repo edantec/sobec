@@ -77,13 +77,9 @@ void exposeHorizonManager() {
            bp::args("self", "costName","pose"))
       .def("setTerminalTranslationReference", &HorizonManager::setTerminalTranslationReference,
            bp::args("self" "costName", "translation"))
-      .def("activateContactLF", &HorizonManager::activateContactLF,
+      .def("activateContact", &HorizonManager::activateContact,
            bp::args("self", "time", "contactName"))
-      .def("activateContactRF", &HorizonManager::activateContactRF,
-           bp::args("self", "time", "contactName"))
-      .def("removeContactLF", &HorizonManager::removeContactLF,
-           bp::args("self", "time", "contactName"))
-      .def("removeContactRF", &HorizonManager::removeContactRF,
+      .def("removeContact", &HorizonManager::removeContact,
            bp::args("self", "time", "contactName"))
       .def("setForceReference", &HorizonManager::setForceReference,
            bp::args("self", "time", "costName", "ref_wrench"))

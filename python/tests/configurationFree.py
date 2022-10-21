@@ -43,7 +43,7 @@ blocked_joints = [
 total_steps = 50
 DT = 1e-2  # Time step of the DDP
 T = 100  # Time horizon of the DDP (number of nodes)
-TdoubleSupport = 1  # Double support time  # TODO: (check with 20)
+TdoubleSupport = 10  # Double support time  # TODO: (check with 20)
 TsingleSupport = 50  # Single support time
 simu_step = simu_period = 1e-3  #
 
@@ -136,13 +136,13 @@ wControlReg = 0.001
 wLimit = 1e3
 wVCoM = 0
 wCoM = 1000
-wWrenchCone = 0.01
+wWrenchCone = 0.005
 wFootRot = 1000
 wGroundCol = 0
-wCoP = 0
-wFlyHigh = 5000
+wCoP = 20
+wFlyHigh = 1000
 wVelFoot = 0
-wColFeet = 1000
+wColFeet = 3000
 wSurface = 0
 
 weightBasePos = [0, 0, 0, 1000, 1000, 0]  # [x, y, z| x, y, z]

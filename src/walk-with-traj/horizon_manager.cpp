@@ -102,24 +102,14 @@ HorizonManager::actuation(const unsigned long time) {
       dam(time)->get_actuation());
 }
 
-void HorizonManager::activateContactLF(const unsigned long time,
-                                       const std::string &nameContactLF) {
-  contacts(time)->changeContactStatus(nameContactLF, true);
+void HorizonManager::activateContact(const unsigned long time,
+                                     const std::string &nameContact) {
+  contacts(time)->changeContactStatus(nameContact, true);
 }
 
-void HorizonManager::activateContactRF(const unsigned long time,
-                                       const std::string &nameContactRF) {
-  contacts(time)->changeContactStatus(nameContactRF, true);
-}
-
-void HorizonManager::removeContactLF(const unsigned long time,
-                                     const std::string &nameContactLF) {
-  contacts(time)->changeContactStatus(nameContactLF, false);
-}
-
-void HorizonManager::removeContactRF(const unsigned long time,
-                                     const std::string &nameContactRF) {
-  contacts(time)->changeContactStatus(nameContactRF, false);
+void HorizonManager::removeContact(const unsigned long time,
+                                   const std::string &nameContact) {
+  contacts(time)->changeContactStatus(nameContact, false);
 }
 
 void HorizonManager::setBalancingTorque(const unsigned long time,
@@ -273,8 +263,8 @@ void HorizonManager::setSwingingLF(const unsigned long time,
                                    const std::string &nameContactLF,
                                    const std::string &nameContactRF,
                                    const std::string &nameForceCostLF) {
-  removeContactLF(time, nameContactLF);
-  activateContactRF(time, nameContactRF);
+  removeContact(time, nameContactLF);
+  activateContact(time, nameContactRF);
   setWrenchReference(time, nameForceCostLF,eVector6::Zero());
 }
 
@@ -282,16 +272,16 @@ void HorizonManager::setSwingingRF(const unsigned long time,
                                    const std::string &nameContactLF,
                                    const std::string &nameContactRF,
                                    const std::string &nameForceCostRF) {
-  activateContactLF(time, nameContactLF);
-  removeContactRF(time, nameContactRF);
+  activateContact(time, nameContactLF);
+  removeContact(time, nameContactRF);
   setWrenchReference(time, nameForceCostRF,eVector6::Zero());
 }
 
 void HorizonManager::setDoubleSupport(const unsigned long time,
                                       const std::string &nameContactLF,
                                       const std::string &nameContactRF) {
-  activateContactLF(time, nameContactLF);
-  activateContactRF(time, nameContactRF);
+  activateContact(time, nameContactLF);
+  activateContact(time, nameContactRF);
 }
 
 const eVector3 &HorizonManager::getFootForce(
