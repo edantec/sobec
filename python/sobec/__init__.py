@@ -14,6 +14,7 @@ from .sobec_pywrap import (
     ResidualModelFlyHigh,
     ResidualModelFlyAngle,
     ResidualModel2DSurface,
+    ResidualModelPower,
     IntegratedActionModelLPF,
     StateLPF,
     ContactModel6D,

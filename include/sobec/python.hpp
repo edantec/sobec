@@ -17,6 +17,7 @@ void exposeResidualFlyHigh();
 void exposeResidualFlyAngle();
 void exposeResidualDCMPosition();
 void exposeResidual2DSurface();
+void exposeResidualPower();
 void exposeActivationQuadRef();
 void exposeDesigner();
 void exposeHorizonManager();

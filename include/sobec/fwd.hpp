@@ -123,6 +123,14 @@ struct ResidualData2DSurfaceTpl;
 typedef ResidualModel2DSurfaceTpl<double> ResidualModel2DSurface;
 typedef ResidualData2DSurfaceTpl<double> ResidualData2DSurface;
 
+// Cost power
+template <typename Scalar>
+class ResidualModelPowerTpl;
+template <typename Scalar>
+struct ResidualDataPowerTpl;
+typedef ResidualModelPowerTpl<double> ResidualModelPower;
+typedef ResidualDataPowerTpl<double> ResidualDataPower;
+
 // Activation quad-ref
 template <typename Scalar>
 class ActivationModelQuadRefTpl;

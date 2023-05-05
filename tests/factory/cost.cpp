@@ -19,6 +19,7 @@
 #include "sobec/crocomplements/residual-dcm-position.hpp"
 #include "sobec/crocomplements/residual-fly-angle.hpp"
 #include "sobec/crocomplements/residual-fly-high.hpp"
+#include "sobec/crocomplements/residual-power.hpp"
 // #include "crocoddyl/multibody/residuals/centroidal-momentum.hpp"
 #include <crocoddyl/core/costs/cost-sum.hpp>
 #include <crocoddyl/core/utils/exception.hpp>
@@ -56,6 +57,9 @@ std::ostream& operator<<(std::ostream& os, CostModelTypes::Type type) {
       // case CostModelTypes::CostModelResidualFlyAngle:
       //    os << "CostModelResidualFlyAngle";
       //    break;
+    case CostModelTypes::CostModelResidualPower:
+      os << "CostModelResidualPower";
+      break;
     case CostModelTypes::CostModelResidual2DSurface:
       os << "CostModelResidual2DSurface";
       break;
@@ -156,6 +160,12 @@ boost::shared_ptr<crocoddyl::CostModelAbstract> CostModelFactory::create(CostMod
     //                                                       beta, gamma,nu));
     //   break;
     // }
+    case CostModelTypes::CostModelResidualPower: {
+       cost = boost::make_shared<crocoddyl::CostModelResidual>(
+           state, activation_factory.create(activation_type, nu),
+           boost::make_shared<sobec::ResidualModelPower>(state,nu));
+       break;
+    }
     case CostModelTypes::CostModelResidual2DSurface: {
       cost = boost::make_shared<crocoddyl::CostModelResidual>(
           state, activation_factory.create(activation_type, 2),

@@ -18,6 +18,7 @@ BOOST_PYTHON_MODULE(sobec_pywrap) {
   sobec::python::exposeResidualFlyAngle();
   sobec::python::exposeResidualDCMPosition();
   sobec::python::exposeResidual2DSurface();
+  sobec::python::exposeResidualPower();
   sobec::python::exposeActivationQuadRef();
   sobec::python::exposeDesigner();
   sobec::python::exposeHorizonManager();

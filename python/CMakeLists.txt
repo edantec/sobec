@@ -11,6 +11,7 @@ set(${PY_NAME}_SOURCES
     crocomplements/residual-fly-angle.cpp
     crocomplements/residual-dcm-position.cpp
     crocomplements/residual-2D-surface.cpp
+    crocomplements/residual-power.cpp
     crocomplements/activation-quad-ref.cpp
     crocomplements/lowpassfilter/action.cpp
     crocomplements/lowpassfilter/state.cpp
